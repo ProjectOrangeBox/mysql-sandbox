@@ -16,10 +16,12 @@ granted to it, and the ACL tables have to exist before either.
 | File | What it is |
 | --- | --- |
 | `10-acl-tables.sql` | The six [`orange/acl`](https://github.com/ProjectOrangeBox/acl) tables, in dependency order |
-| `20-acl-seed.sql` | An admin and a guest user, plus the administrator role |
+| `20-acl-seed.sql` | An admin and a guest user, the role, and the orders permissions |
 | `30-records.sql` | The `records` table behind the REST + Vue example |
+| `35-records-seed.sql` | Three sample records |
 | `40-calendar.sql` | The `calendar_events` table |
-| `50-orders.sql` | Customers, orders and order lines, plus this demo's two permissions |
+| `50-orders.sql` | Customers, orders and order lines |
+| `55-orders-seed.sql` | Two orders with line items |
 
 Leave gaps in the numbering. Inserting something between two existing steps is
 otherwise a rename of everything after it.
@@ -45,6 +47,23 @@ reachable should ever be running it.
   docker compose up -d
   ```
 
-- These are hand-maintained snapshots, not migrations: they describe the schema
-  as it should be on a fresh database, and say nothing about getting an existing
-  one there. A migration tool is the intended replacement.
+## These files are generated
+
+They are **not** hand-maintained. They are dumped from the Phinx migrations in
+[Orange-Application](https://github.com/ProjectOrangeBox/Orange-Application)
+(`database/migrations` and `database/seeds`) by `composer db:export`, which
+builds a scratch database, migrates and seeds it, dumps the result here, and
+drops it again.
+
+Edit a migration, not these files - anything changed here is overwritten the
+next time someone regenerates. `composer db:check` fails when the two disagree.
+
+If you are loading this into your own MySQL rather than using the sandbox, the
+files are plain SQL and load in numeric order:
+
+```sh
+for f in initdb/*.sql; do mysql yourdb < "$f"; done
+```
+
+Schema and seed data are separate files on purpose, so you can take the schema
+without the example rows - skip the `*-seed.sql` ones.
