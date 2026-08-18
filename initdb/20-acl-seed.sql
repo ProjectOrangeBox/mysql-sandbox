@@ -26,19 +26,19 @@ UNLOCK TABLES;
 
 LOCK TABLES `orange_roles` WRITE;
 /*!40000 ALTER TABLE `orange_roles` DISABLE KEYS */;
-INSERT INTO `orange_roles` (`id`, `name`, `description`, `migration`, `is_active`) VALUES (1,'orders manager','May create and delete orders',NULL,1);
+INSERT INTO `orange_roles` (`id`, `name`, `description`, `migration`, `is_active`) VALUES (1,'orders manager','May create, edit and delete orders',NULL,1);
 /*!40000 ALTER TABLE `orange_roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
 LOCK TABLES `orange_permissions` WRITE;
 /*!40000 ALTER TABLE `orange_permissions` DISABLE KEYS */;
-INSERT INTO `orange_permissions` (`id`, `key`, `description`, `group`, `migration`, `is_active`) VALUES (1,'orders.create','Create an order','orders',NULL,1),(2,'orders.delete','Delete an order','orders',NULL,1);
+INSERT INTO `orange_permissions` (`id`, `key`, `description`, `group`, `migration`, `is_active`) VALUES (1,'orders.create','Create an order','orders',NULL,1),(2,'orders.delete','Delete an order','orders',NULL,1),(3,'orders.update','Edit an order','orders',NULL,1);
 /*!40000 ALTER TABLE `orange_permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
 LOCK TABLES `orange_role_permission` WRITE;
 /*!40000 ALTER TABLE `orange_role_permission` DISABLE KEYS */;
-INSERT INTO `orange_role_permission` (`role_id`, `permission_id`) VALUES (1,1),(1,2);
+INSERT INTO `orange_role_permission` (`role_id`, `permission_id`) VALUES (1,1),(1,2),(1,3);
 /*!40000 ALTER TABLE `orange_role_permission` ENABLE KEYS */;
 UNLOCK TABLES;
 
