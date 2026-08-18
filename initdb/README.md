@@ -16,15 +16,24 @@ granted to it, and the ACL tables have to exist before either.
 | File | What it is |
 | --- | --- |
 | `10-acl-tables.sql` | The six [`orange/acl`](https://github.com/ProjectOrangeBox/acl) tables, in dependency order |
+| `15-login-attempts.sql` | The `login_attempts` table behind the login throttle — starts empty |
+| `16-user-tokens.sql` | The `user_tokens` table behind password reset and signup confirmation — starts empty |
 | `20-acl-seed.sql` | An admin and a guest user, the role, and the orders permissions |
 | `30-records.sql` | The `records` table behind the REST + Vue example |
 | `35-records-seed.sql` | Three sample records |
 | `40-calendar.sql` | The `calendar_events` table |
 | `50-orders.sql` | Customers, orders and order lines |
 | `55-orders-seed.sql` | Two orders with line items |
+| `90-phinxlog.sql` | Phinx's record of which migrations produced all of the above |
 
 Leave gaps in the numbering. Inserting something between two existing steps is
 otherwise a rename of everything after it.
+
+**`90-phinxlog.sql` is what makes this database a starting point rather than a
+dead end.** Without it a sandbox comes up with every table present and no record
+of a single migration, so the first `composer db:migrate` against it replays
+migration one and dies on "table orange_users already exists". It is written
+last, so it names a schema that is fully loaded by the time it lands.
 
 **The guest user in `20-acl-seed.sql` is not decoration.** `orange/acl` resolves
 every request without a login to the id in its `guest user` config (2 by

@@ -70,16 +70,18 @@ poked at it — the whole point of a sandbox.
 
 ## Backing the REST API and Vue example
 
-The bundled [initdb/webapp_sample.sql](initdb/webapp_sample.sql) creates one
-table, `records`, and seeds it with three rows. That table is the far end of a
-chain that runs through both example applications:
+The bundled [initdb/30-records.sql](initdb/30-records.sql) creates one table,
+`records`, and [initdb/35-records-seed.sql](initdb/35-records-seed.sql) seeds it
+with three rows. That table is the far end of a chain that runs through both
+example applications:
 
 ```
-initdb/webapp_sample.sql          this container, imported on first run
+initdb/30-records.sql                                               this container, imported on first run
+initdb/35-records-seed.sql                                          three example rows
   └── records table
-        └── api/models/RecordModel.php          PDO queries
-              └── api/controllers/RestController.php    JSON endpoints
-                    └── src/stores/records.ts    the Vue app's Pinia store
+        └── application/api/models/RecordModel.php                  PDO queries
+              └── application/api/controllers/RestController.php    JSON endpoints
+                    └── src/stores/records.ts                       the Vue app's Pinia store
 ```
 
 `RestController` exposes plain CRUD over that one table:
@@ -93,23 +95,24 @@ initdb/webapp_sample.sql          this container, imported on first run
 | `DELETE` | `/api/delete/{id}` | delete                   |
 
 The Vue front end talks to exactly those five, via `VITE_API_BASE_URL` in its
-`.env` (`http://localhost:8080/api` against the webapp's HTTP port, or
-`https://localhost:8443/api` for TLS). With all three containers up you get the
-whole stack: Vue on `:3000`, the API on `:8080`, this database on `:3306`.
+`.env` — `/api`, relative on purpose. The PHP session cookie is
+`SameSite=Strict`, so an absolute `http://localhost:8080/api` means the browser
+never sends it: logging in appears to succeed and every request after it comes
+back as the guest. Both the Vue dev server and its production nginx proxy
+`/api` through to the webapp, so the browser only ever sees one origin. With all
+three containers up you get the whole stack: Vue on `:3000`, the API on `:8080`,
+this database on `:3306`.
 
 So the seeded `records` rows are what make the example list render with
 something in it on a fresh checkout, rather than an empty table and a demo that
 looks broken.
 
-**The calendar example needs one more table.** `CalendarController`
-(`/api/calendar/...`) reads a `calendar_events` table that this dump does *not*
-create — it ships in the webapp repo as `database/calendar_events.sql`. Apply it
-yourself if you want that endpoint to work:
-
-```sh
-docker exec -i webapp-mysql mysql -uwebapp -pwebapp_password webapp \
-  < /path/to/webapp/database/calendar_events.sql
-```
+**The calendar example starts empty.** `CalendarController`
+(`/api/calendar/...`) reads the `calendar_events` table, which
+[initdb/40-calendar.sql](initdb/40-calendar.sql) does create. There is no
+calendar seeder to go with it, though, so the table arrives with no rows and the
+month view renders blank until something adds some — an empty demo rather than a
+broken one.
 
 ## Connecting to it
 
